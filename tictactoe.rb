@@ -1,14 +1,26 @@
 module Tictactoe
 
+	class PlayerOne
+	end
+
+	class PlayerTwo
+	end
+
+	class PlayerComp
+	end
+
 	class Game
 		
-		@game_over = false
+		def initialize
+			clear_grid
+			@game_over = false
+			play_game
+		end
 
-			@@marks = {
-				"a1" => " ", 	"a2" => " ", 	"a3" => " ",	# top row
-				"b1" => " ", 	"b2" => " ", 	"b3" => " ",	# middle row
-				"c1" => " ", 	"c2" => " ", 	"c3" => " "		# bottom row
-			}
+		def new_game
+			game = Tictactoe::Game.new
+			game.play_game
+		end
 
 		def play_game
 			until @game_over == true
@@ -20,6 +32,21 @@ module Tictactoe
 					mark_grid
 				end
 			end
+			puts "Play again? (y/n)"
+			answer = gets.chomp.downcase
+			if answer == "y"
+				new_game
+			else
+				puts "Thanks for playing!"
+			end
+		end
+
+		def clear_grid
+			@@marks = {
+				"a1" => " ", 	"a2" => " ", 	"a3" => " ",	# top row
+				"b1" => " ", 	"b2" => " ", 	"b3" => " ",	# middle row
+				"c1" => " ", 	"c2" => " ", 	"c3" => " "		# bottom row
+			}
 		end
 
 		def show_grid
@@ -59,7 +86,7 @@ module Tictactoe
 			end
 		end
 	end
-end
 
-game = Tictactoe::Game.new
-game.play_game
+	game = Tictactoe::Game.new
+
+end
