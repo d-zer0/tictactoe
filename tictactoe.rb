@@ -36,11 +36,6 @@ module Tictactoe
 			play_game
 		end
 
-		def new_game
-			game = Tictactoe::Game.new
-			game.play_game
-		end
-
 		def turn_swap
 			@active_player, @waiting_player = @waiting_player, @active_player
 		end
@@ -52,15 +47,20 @@ module Tictactoe
 					puts "Game Over!"
 					@game_over = true
 				else
-					mark_grid
+					take_turn
+					check_for_victory
 					turn_swap
 				end
 			end
+			rematch
+		end
+
+		def rematch
 			puts
 			puts "Play again? (y/n)"
 			answer = gets.chomp.downcase
 			if answer == "y"
-				new_game
+				initialize(@loser, @winner)
 			else
 				puts
 				puts "Thanks for playing!"
@@ -81,7 +81,7 @@ module Tictactoe
 			horizontal =	"  _____|_____|_____"
 
 			system "cls"
-			puts "- #{@player_one.name} VS. #{@player_two.name} -"
+			puts "[#{@player_one.mark}] #{@player_one.name} VS. #{@player_two.name} [#{@player_two.mark}]"
 			puts
 			puts "    1     2     3  "
 			puts vertical
@@ -95,27 +95,75 @@ module Tictactoe
 			puts vertical
 		end
 
-		def mark_grid
+		def take_turn
 			puts
 			puts "#{@active_player.name.upcase}'s TURN"
-			print "Choose a cell: "
+			print "Place your #{@active_player.mark}: "
 			choice = gets.chomp.downcase
-			if @@marks[choice] != " "
+			if choice == "all"
+				@@marks["a1"] = @active_player.mark
+				@@marks["a2"] = @active_player.mark
+				@@marks["a3"] = @active_player.mark
+				@@marks["b1"] = @active_player.mark
+				@@marks["b2"] = @active_player.mark
+				@@marks["b3"] = @active_player.mark
+				@@marks["c1"] = @active_player.mark
+				@@marks["c2"] = @active_player.mark
+				@@marks["c3"] = @active_player.mark
+			elsif choice == "top"
+				@@marks["a1"] = @active_player.mark
+				@@marks["a2"] = @active_player.mark
+				@@marks["a3"] = @active_player.mark
+			elsif @@marks[choice] != " "
 				puts
-				puts "Already occupied! Choose an empty cell."
-				mark_grid
-			elsif choice == "all"
-				@@marks["a1"] = "O"
-				@@marks["a2"] = "O"
-				@@marks["a3"] = "O"
-				@@marks["b1"] = "O"
-				@@marks["b2"] = "O"
-				@@marks["b3"] = "O"
-				@@marks["c1"] = "O"
-				@@marks["c2"] = "O"
-				@@marks["c3"] = "O"
+				puts "Invalid choice, choose an empty cell."
+				take_turn
 			else
 				@@marks[choice] = @active_player.mark
+			end
+			show_grid
+		end
+
+		def check_for_victory
+			victory = false
+
+			# Horizontal victories
+			if ((@@marks["a1"] == @active_player.mark) && (@@marks["a2"] == @active_player.mark) && (@@marks["a3"] == @active_player.mark))
+				victory = true
+			elsif
+				((@@marks["b1"] == @active_player.mark) && (@@marks["b2"] == @active_player.mark) && (@@marks["b3"] == @active_player.mark)) 
+				victory = true
+			elsif
+				((@@marks["c1"] == @active_player.mark) && (@@marks["c2"] == @active_player.mark) && (@@marks["c3"] == @active_player.mark)) 
+				victory = true
+
+			# Vertical victories
+			elsif
+				((@@marks["a1"] == @active_player.mark) && (@@marks["b1"] == @active_player.mark) && (@@marks["c1"] == @active_player.mark)) 
+				victory = true
+			elsif
+				((@@marks["a2"] == @active_player.mark) && (@@marks["b2"] == @active_player.mark) && (@@marks["c2"] == @active_player.mark)) 
+				victory = true
+			elsif
+				((@@marks["a3"] == @active_player.mark) && (@@marks["b3"] == @active_player.mark) && (@@marks["c3"] == @active_player.mark)) 
+				victory = true
+
+			# Diagonal victories
+			elsif
+				((@@marks["a1"] == @active_player.mark) && (@@marks["b2"] == @active_player.mark) && (@@marks["c3"] == @active_player.mark)) 
+				victory = true
+			elsif
+				((@@marks["a3"] == @active_player.mark) && (@@marks["b2"] == @active_player.mark) && (@@marks["c1"] == @active_player.mark)) 
+				victory = true
+			end
+
+			if victory
+				puts
+				puts "Game Over!"
+				puts "Winner: #{@active_player.name}"
+				@game_over = true
+				@winner = @active_player
+				@loser = @waiting_player
 			end
 		end
 	end
