@@ -1,25 +1,48 @@
 module Tictactoe
 
 	class PlayerOne
+		attr_accessor :name
+
+		def initialize(name)
+			@name = name
+		end
+
+		def name
+			@name
+		end
+
+		def mark
+			"X"
+		end
 	end
 
-	class PlayerTwo
+	class PlayerTwo < PlayerOne
+
+		def mark
+			"O"
+		end
 	end
 
-	class PlayerComp
-	end
 
 	class Game
 		
-		def initialize
+		def initialize(player_one, player_two)
 			clear_grid
 			@game_over = false
+			@player_one = player_one
+			@player_two = player_two
+			@active_player = @player_one
+			@waiting_player = @player_two
 			play_game
 		end
 
 		def new_game
 			game = Tictactoe::Game.new
 			game.play_game
+		end
+
+		def turn_swap
+			@active_player, @waiting_player = @waiting_player, @active_player
 		end
 
 		def play_game
@@ -30,13 +53,16 @@ module Tictactoe
 					@game_over = true
 				else
 					mark_grid
+					turn_swap
 				end
 			end
+			puts
 			puts "Play again? (y/n)"
 			answer = gets.chomp.downcase
 			if answer == "y"
 				new_game
 			else
+				puts
 				puts "Thanks for playing!"
 			end
 		end
@@ -50,12 +76,13 @@ module Tictactoe
 		end
 
 		def show_grid
-
 			vertical =		"       |     |    "
 			# 					 X  |  O  |  X
 			horizontal =	"  _____|_____|_____"
 
-
+			system "cls"
+			puts "- #{@player_one.name} VS. #{@player_two.name} -"
+			puts
 			puts "    1     2     3  "
 			puts vertical
 			puts "A   #{@@marks["a1"]}  |  #{@@marks["a2"]}  |  #{@@marks["a3"]}  "
@@ -69,9 +96,15 @@ module Tictactoe
 		end
 
 		def mark_grid
-			puts "Which cell?"
+			puts
+			puts "#{@active_player.name.upcase}'s TURN"
+			print "Choose a cell: "
 			choice = gets.chomp.downcase
-			if choice == "all"
+			if @@marks[choice] != " "
+				puts
+				puts "Already occupied! Choose an empty cell."
+				mark_grid
+			elsif choice == "all"
 				@@marks["a1"] = "O"
 				@@marks["a2"] = "O"
 				@@marks["a3"] = "O"
@@ -82,11 +115,22 @@ module Tictactoe
 				@@marks["c2"] = "O"
 				@@marks["c3"] = "O"
 			else
-				@@marks[choice] = "O"
+				@@marks[choice] = @active_player.mark
 			end
 		end
 	end
-
-	game = Tictactoe::Game.new
-
+	system "cls"
+	puts "Welcome to Tictactoe!"
+	puts
+	puts "Player One, please enter your name:"
+	name = gets.chomp.to_s
+	player_one = Tictactoe::PlayerOne.new(name)
+	system "cls"
+	puts "Welcome to Tictactoe!"
+	puts
+	puts "Player Two, please enter your name:"
+	name = gets.chomp.to_s
+	player_two = Tictactoe::PlayerTwo.new(name)
+	system "cls"
+	game = Tictactoe::Game.new(player_one, player_two)
 end
